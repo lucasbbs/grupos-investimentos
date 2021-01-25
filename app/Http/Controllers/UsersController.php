@@ -18,13 +18,13 @@ class UsersController extends Controller
 {
     protected $service;
     protected $repository;
-
-    public function __construct(UserRepository $repository, UserService $service)
+    protected $validator;
+    public function __construct(UserRepository $repository, UserValidator $validator, UserService $service)
     {
-		$this->repository 	= $repository;
-		$this->service 		= $service;
+        $this->repository 	= $repository;
+        $this->service 		= $service;
+        $this->validator  = $validator;
     }
-
 
     /**
      * Display a listing of the resource.
@@ -33,11 +33,11 @@ class UsersController extends Controller
      */
     public function index()
     {
-		$users = $this->repository->all();
-
+        $users = $this->repository->all();
+    
         return view('user.index', [
-			'users' => $users
-		]);
+            'users' => $users
+         ]); 
     }
 
     /**
@@ -49,20 +49,19 @@ class UsersController extends Controller
      */
     public function store(UserCreateRequest $request)
     {
-        // dd( $request );
-		$request = $this->service->store($request->all());
-
-		$usuario = $request['success'] ? $request['data'] : null;
-
-		session()->flash('success', [
-			'success' 	=> $request['success'],
-			'messages' 	=> $request['messages']
-		]);
+        $request = $this->service->store($request->all());
+        
+        $usuario = $request['success'] ? $request['data'] : null;
+        
+        session()->flash('success', [
+            'success' 	=> $request['success'],
+            'messages' 	=> $request['messages']
+        ]);
 
         return redirect()->route('user.index');
     }
 
-
+    
     /**
      * Display the specified resource.
      *
@@ -84,7 +83,6 @@ class UsersController extends Controller
         return view('users.show', compact('user'));
     }
 
-
     /**
      * Show the form for editing the specified resource.
      *
@@ -96,11 +94,10 @@ class UsersController extends Controller
     {
         $user = $this->repository->find($id);
 
-        return view('user.edit', [
+        return view('user.edit',[
             'user' => $user
         ]);
     }
-
 
     /**
      * Update the specified resource in storage.
@@ -114,7 +111,7 @@ class UsersController extends Controller
     {
         $request = $this->service->update($request->all(), $id);
         $usuario = $request['success'] ? $request['data'] : null;
-
+        
         session()->flash('success', [
             'success'   => $request['success'],
             'messages'  => $request['messages']
@@ -133,13 +130,16 @@ class UsersController extends Controller
      */
     public function destroy($id)
     {
-		$request = $this->service->destroy($id);
+        $request = $this->service->destroy($id);
+        
+        $usuario = $request['success'] ? $request['data']:null;
+        
+        
+        session()->flash('success', [
+            'success' 	=> $request['success'],
+            'messages' 	=> $request['messages']
+        ]);
 
-		session()->flash('success', [
-			'success' 	=> $request['success'],
-			'messages' 	=> $request['messages']
-		]);
-
-        return redirect()->route('user.index');
+        return $this->index();
     }
 }

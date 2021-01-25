@@ -14,14 +14,13 @@ class Controller extends BaseController
 
     public function homepage()
     {
-        $variavel = "Homepage do sitema de gestão para grupos de investimento";
-
+        $variavel = "Homepage do sistema de gestão para grupos de investimento";
         return view('welcome', [
             'title' => $variavel
         ]);
     }
 
-    public function cadastar()
+    public function cadastrar()
     {
         echo "Tela de cadastro";
     }
@@ -35,6 +34,4 @@ class Controller extends BaseController
     {
         return view('user.login');
     }
-
-
 }
